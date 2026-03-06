@@ -1,4 +1,5 @@
 import express from "express";
+import authRoutes from "./routes/auth.routes.js"
 
 const app = express()
 
@@ -10,5 +11,7 @@ app.get('/health',(req,res) =>{
         uptime: process.uptime()
     })
 })
+
+app.use("/auth",authRoutes);
 
 export default app;
