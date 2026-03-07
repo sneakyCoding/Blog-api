@@ -5,6 +5,7 @@ import { signToken } from "../utils/jwt.js";
 export const signup = async (req, res) => {
     try {
         const { name, email, password } = req.body;
+
         if (!name || !email || !password) return res.status(400).json({ message: "Invalid Credentials" });
         if (typeof name !== "string" || typeof email !== "string" || typeof password !== "string") return res.status(400).json({ message: "Invalid Credentials" });
         if (name.trim() === "" || email.trim() === "" || password.trim() === "") return res.status(400).json({ message: "Invalid Credentials" });
@@ -12,6 +13,8 @@ export const signup = async (req, res) => {
 
         const hashP = await bcrypt.hash(password, 10);
         const user = await User.create({ name, email, password: hashP });
+
+        const token = signToken(user._id);
 
         return res.status(201).json({
             status: "success",
@@ -32,13 +35,13 @@ export const login = async (req, res) => {
         const { email, password } = req.body;
         if (!email || !password) return res.status(400).json({ message: "Invalid Credentials" });
         if (email.trim() === "" || password.trim() === "") return res.status(400).json({ message: "Invalid Credentials" });
-        if (password.length < 6) return res.status(400).json({ message: "Password must be at least 6 characters" });
+        if (password.length < 6) return res.status(400).json({ message: "Wrong Password" });
 
         const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ message: "User not found" });
+        if (!user) return res.status(404).json({ message: "Invalid Credentials" });
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(401).json({ message: "Invalid password" });
+        if (!isMatch) return res.status(401).json({ message: "Invalid Credentials" });
 
         const token = signToken(user._id);
 
