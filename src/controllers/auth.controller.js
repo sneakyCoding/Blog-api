@@ -35,7 +35,7 @@ export const login = async (req, res) => {
         const { email, password } = req.body;
         if (!email || !password) return res.status(400).json({ message: "Invalid Credentials" });
         if (email.trim() === "" || password.trim() === "") return res.status(400).json({ message: "Invalid Credentials" });
-        if (password.length < 6) return res.status(400).json({ message: "Wrong Password" });
+        // if (password.length < 6) return res.status(400).json({ message: "Wrong Password" });
 
         const user = await User.findOne({ email });
         if (!user) return res.status(404).json({ message: "Invalid Credentials" });
