@@ -4,15 +4,16 @@ import { signToken } from "../utils/jwt.js";
 
 export const signup = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        // Mistake before: destructuring req.body directly can throw when body is missing.
+        const { name, email, password } = req.body || {};
 
         if (!name || !email || !password) return res.status(400).json({ message: "Invalid Credentials" });
         if (typeof name !== "string" || typeof email !== "string" || typeof password !== "string") return res.status(400).json({ message: "Invalid Credentials" });
         if (name.trim() === "" || email.trim() === "" || password.trim() === "") return res.status(400).json({ message: "Invalid Credentials" });
         if (password.length < 6) return res.status(400).json({ message: "Password must be at least 6 characters" });
 
-        const hashP = await bcrypt.hash(password, 10);
-        const user = await User.create({ name, email, password: hashP });
+        // Password hashing is handled in userSchema.pre("save").
+        const user = await User.create({ name, email, password });
 
         const token = signToken(user._id);
 
@@ -32,7 +33,8 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        // Mistake before: destructuring req.body directly can throw when body is missing.
+        const { email, password } = req.body || {};
         if (!email || !password) return res.status(400).json({ message: "Invalid Credentials" });
         if (email.trim() === "" || password.trim() === "") return res.status(400).json({ message: "Invalid Credentials" });
         // if (password.length < 6) return res.status(400).json({ message: "Wrong Password" });
