@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Post from "../models/post.model.js";
+import APIfeatures from "../utils/apiFeatures.js";
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
@@ -41,8 +42,9 @@ export const createPost = async (req, res) => {
 
 export const readAllPost = async (req, res) => {
     try {
+        const features = new APIfeatures(await Post.find().paginate().sort("-createdAt"));
         // Previously: (await Post.find()).sort({createdAt:-1}) sorts an array with wrong argument.
-        const posts = await Post.find().sort({ createdAt: -1 });
+        const posts = await features.query;
 
         return res.status(200).json({ status: "success", posts });
     } catch (error) {
